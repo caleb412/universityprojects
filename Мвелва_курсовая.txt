@@ -1,0 +1,328 @@
+CREATE TABLE EXHIBITIONS(
+exhibition_id serial primary key,
+exhibition_name text not null default 'no_name',
+start_date date not null, 
+end_date date not null, 
+check (end_date > start_date)
+);
+CREATE TABLE ITEMS(
+item_id serial primary key,
+item_name text not null default 'no_name',
+date_of_entry date not null, 
+exhibition_id int not null references exhibitions(exhibition_id)  
+);
+CREATE TABLE MEMBERSHIPS(
+membership_id serial primary key,
+membership_type text not null,
+start_date date not null,
+expiry_date date not null
+check (expiry_date > start_date)
+);
+CREATE TABLE VISITORS(
+visitor_id serial primary key,
+surname text not null, 
+name text not null,
+date_of_birth date not null,
+gender character varying(10) not null,
+contact_information character varying(50),
+membership_id int not null unique references memberships(membership_id)
+);
+CREATE TABLE TICKETS(
+ticket_id serial primary key,
+ticket_name text not null,
+ticket_price decimal(8,2) not null,
+exhibition_id int not null references exhibitions(exhibition_id),
+visitor_id int not null references visitors(visitor_id),
+date date not null
+);
+CREATE TABLE FEEDBACK(
+feedback_id serial primary key,
+visitor_id int not null references visitors(visitor_id),
+rating int not null check(rating<5) check(rating >0),
+comments text not null 
+);
+CREATE TABLE VISITOR_PURCHASES(
+purchase_id serial primary key,
+visitor_id int not null references visitors(visitor_id),
+item_name text not null,
+amount decimal(8,2) not null
+);
+INSERT INTO EXHIBITIONS(exhibition_name,start_date,end_date)
+VALUES ('Ancient Egypt','2024-01-04','2025-01-04'),
+('Ancient Rome','2022-04-12','2025-01-04'),('English Kings','2024-01-04','2025-05-04'),
+('Mayan Culture','2024-03-25','2024-04-25'),('Emperors of Rome','2024-08-01','2024-09-01'),
+('Napeleon Bonaparte','2024-01-01','2025-03-01'),('John F. Kennedy','2024-11-01','2025-12-01'),
+('Shaka Zulu','2024-02-18','2025-03-18'),('American Presidents','2023-01-04','2024-01-04'),
+('Dictators of History','2024-06-10','2025-06-30'),('The Dark Ages','2024-11-01','2025-01-04'),
+('World War 1','2024-05-09','2025-06-22'), ('World War 2','2024-05-09','2025-06-22'),
+('Muhammad Ali','2024-07-03','2024-09-03'), ('Black Heroes','2024-02-01','2025-03-01');
+
+INSERT INTO items(item_name,date_of_entry,exhibition_id)
+VALUES ('Bust of Nefertiti','2020-04-01',1),('Map','2013-12-04',13),
+('French Crown','2019-01-31',6),('Pottery','2021-08-11',4),
+('Fated Bullet','2002-04-02',7),('Spear','2010-06-22',8),
+('Chair of King Tut','2020-03-01',1),('Gun','2020-02-08',12),
+('Bust of Adolf Hitler','2021-01-21',10),('Throne','2020-04-13',15),
+('Tank armour','2010-03-23',13),('Picture','2020-01-09',11),
+('Shelling from Normandy beach','2020-04-01',13),('Sword of Khufu','2015-05-17',1),
+('Assegai','2018-11-13',8),('Ali and Fraser','2018-11-20',14),
+('Auschwitz Rock','2014-05-05',10),('Gloves from the Thrilla in Manilla','2000-03-02',14),
+('Dagger','2020-09-11',5),('Bust of Lee Harvey Oswald','2009-02-02',7),
+('Cleopatra and Antony','2020-04-01',5),('Crown of Henry 1','2020-04-01',3),
+('Lincoln and his Hat','2020-04-01',9);
+
+
+INSERT INTO memberships(membership_type,start_date, expiry_date)
+VALUES ('Premium','2024-05-23','2025-05-23'),('Standard','2024-01-22','2024-06-22'),
+('Premium','2024-03-01','2025-03-01'),('Premium','2020-05-23','2021-05-23'),
+('Basic','2024-03-03','2024-09-03'),('Standard','2024-01-22','2024-06-22'),
+('Basic','2024-03-13','2024-09-13'),('Premium','2024-05-01','2025-05-01'),
+('Premium','2024-01-20','2025-01-20'),('Premium','2024-04-22','2025-10-22'),
+('Standard','2020-05-23','2021-11-23'),('Premium','2024-05-23','2025-05-23'),
+('Premium','2024-05-23','2025-05-23'),('Premium','2024-02-20','2025-02-20'),
+('Premium','2024-03-09','2025-03-09'),('Premium','2024-05-23','2025-05-23');
+
+INSERT INTO visitors(surname,name,date_of_birth,gender,contact_information,membership_id)
+VALUES('Smith','John','1973-04-21','male','johnsmith@gmail.com','10'),('Bond','James','1963-05-12','male','jamesbond@yahoo.com','7'),
+('Ailing','Samantha','1995-12-01','female','sammyailing@gmail.com','9'),('Banner','Bruce','2005-05-10','male','hulkbb@gmail.com','16'),
+('Bertov','Anthony','1989-03-22','male','antbertov@gmail.com','3'),('Rostova','Cathy','1993-02-13','female','crostova@gmail.com','6'),
+('White','Walter','1995-02-17','male','waltercooks@mail.ru','2'),('Mayer','John','1983-07-21','male','jmayer@gmail.com','8'),
+('Keen','Lizzy','1981-01-10','female','lizkeen@gmail.com','1'),('Shelby','Tommy','1959-09-11','male','tommyshelby@gmail.com','11'),
+('Reddington','Raymond','1976-10-21','male','redreddington@gmail.com','4'),('Unger','Billy','1980-12-21','male','johnsmith@gmail.com','12'),
+('Bourne','Jason','2014-05-16','male','jasonbourne@yahoo.com','5'),('Sao','Zheng','1985-06-20','female','piratesao@gmail.com','13'),
+('Sandra','Jenny','1970-09-11','male','jennys@yahoo.com','15');
+
+INSERT INTO feedback(visitor_id,rating,comments)
+VALUES(1,4,'Perfect Service, amazing exhibitions!'),(4,3,'Good service'),
+(2,2,'The Napoleon exhibition was not good'),(1,4,'Good show'),
+(5,4,'Perfect Service, amazing exhibitions!'),(1,3,'Great staff, good location'),
+(12,4,'Perfect Service, amazing exhibitions!'),(1,3,'Could use more African exhibits'),
+(1,4,'Fun for kids and adults'),(9,4,'Great atmosphere!'),
+(2,4,'Loved the new themes'),(3,4,'Fun experience'),
+(6,4,'Perfect Service, amazing exhibitions!'),(8,4,'Loved it!'),
+(9,4,'Great show'),(1,4,'Stunning exhibitions!');
+
+
+INSERT INTO tickets(ticket_name,ticket_price,exhibition_id,visitor_id,date)
+VALUES('individual','100.00',1,4,'2024-08-12'),('individual','100.00',1,8,'2024-09-08'),
+('individual','100.00',1,7,'2024-08-12'),('student','50.00',7,1,'2024-04-09'),
+('student','50.00',10,4,'2024-08-12'),('senior','80.50',12,5,'2024-07-10'),
+('student','50.00',1,4,'2024-07-01'),('discount','95.00',1,5,'2024-08-12'),
+('senior','80.50',9,8,'2024-12-11'),('individual','100.00',13,9,'2024-08-12'),
+('individual','100.00',1,9,'2024-08-12'),('student','50.00',10,10,'2024-02-14'),
+('individual','100.00',1,5,'2024-08-12'),('individual','100.00',8,12,'2024-08-12'),
+('discount','95.00',2,4,'2024-09-15'),('individual','100.00',1,4,'2024-09-05'),
+('individual','100.00',2,4,'2024-05-12'),('discount','95.00',1,4,'2024-08-10'),
+('individual','100.00',1,4,'2024-07-11'),('individual','100.00',1,9,'2024-09-09');
+
+INSERT INTO visitor_purchases(visitor_id,item_name,amount)
+VALUES(2,'Souvenir','90.00'),(4,'Gift bag','10.50'),(5,'Hamper','99.00'),
+(1,'Smoothie','5.00'),(2,'Bag','5.90'),(10,'Book','95.00'),(12,'Lamp','150.00'),(5,'Chocolate','25.00'),
+(8,'Candles','55.00'),(4,'Alto-bag','200.00'),(14,'Nandrea','59.00'),(3,'Heather bag','202.55'),(9,'Lint free bag','120.00'),
+(13,'Souvenir','45.00'),(6,'Souvenir','90.00'),(9,'Mug','10.00');
+
+select * from visitors
+where visitor_id not in (select visitor_id from visitor_purchases );
+
+select count(*) as "Number of items" from items 
+where item_id in (select item_id from items where exhibition_id = 7);
+
+select v.visitor_id, v.name,v.surname from visitors v
+left join memberships m on 
+v.visitor_id = m.membership_id
+group by v.visitor_id, m.expiry_date
+having (date_part('year',m.expiry_date) < '2025');
+
+select v.visitor_id from visitors v
+join feedback f
+on v.visitor_id = f.visitor_id
+where f.visitor_id in 
+(select visitor_id from feedback 
+group by visitor_id
+having count(visitor_id)>2)
+group by v.visitor_id;
+
+select ticket_name,count(ticket_name) as "Number of purchases" from tickets 
+group by ticket_name
+order by count(ticket_name) desc;
+
+
+select * from visitor_purchases
+where item_name like '%bag%';
+
+select e.exhibition_name, count(i.item_id) "Number of Items" from exhibitions e
+left join items i on 
+e.exhibition_id = i.exhibition_id
+group by e.exhibition_name;
+
+
+select v.name,v.surname,f.comments from visitors v
+join feedback f 
+on v.visitor_id = f.visitor_id
+where name = 'John'
+and surname = 'Mayer';
+
+select * from tickets
+where ticket_name like 'student'
+and ticket_id > 10;
+
+select exhibition_name, end_date - start_date 
+as duration from exhibitions
+order by duration desc limit 5;
+
+select * from visitors
+where contact_information like '%yahoo.com';
+
+select max(expiry_date - start_date) 
+from memberships;
+
+select v.name,v.surname,f.comments from visitors v
+join feedback f 
+on v.visitor_id = f.visitor_id;
+
+select * from exhibitions 
+where exhibition_id not in (select exhibition_id from items);
+
+select round(avg(amount),3) as "Average purchase"
+from visitor_purchases;
+
+CREATE VIEW public.visitor_memberships AS
+select v.surname, v.name, v.membership_id, m.start_date, m.expiry_date 
+from visitors v
+join memberships m 
+on v.membership_id = m.membership_id;
+
+CREATE VIEW items_exhibitions AS 
+select i.item_name, i.date_of_entry, e.exhibition_name
+from items i join exhibitions e 
+on i.exhibition_id = e.exhibition_id;
+
+CREATE VIEW visitors_feedback AS
+select v.visitor_id, v.surname,v.name, f.rating,f.comments
+from visitors v
+join feedback f 
+on v.visitor_id = f.visitor_id;
+
+select * from items_exhibitions
+where exhibition_name = 'John F. Kennedy';
+
+select * from visitors_feedback
+where rating = 3;
+
+select * from visitor_memberships
+where surname in ('Reddington','Keen');
+
+CREATE FUNCTION getExhibitionDuration(name text)
+RETURNS INTEGER AS 
+$$
+BEGIN 
+select (end_date - start_date) as Duration from exhibitions
+where name = exhibition_name;
+RETURN duration;
+END;
+$$ LANGUAGE plpgsql;
+select * from getExhibitionDuration('Ancient Egypt');
+
+CREATE OR REPLACE FUNCTION getAverageRating(visitor_name text, visitor_surname text)
+RETURNS TABLE (surname text, name text, average_rating numeric)
+AS
+$$
+BEGIN
+RETURN QUERY
+select v.surname, v.name, round(avg(f.rating),2) from visitors v 
+join feedback f on
+v.visitor_id = f.visitor_id
+where visitor_surname = v.surname
+and
+visitor_name = v.name
+group by f.visitor_id, v.surname, v.name;
+END;
+$$ LANGUAGE plpgsql;
+select * from getAverageRating('John','Smith');
+select * from getAvergaeRating('John','Mayer');
+
+CREATE OR REPLACE FUNCTION getVisitorPurchases(visitor_name text, visitor_surname text)
+RETURNS TABLE (surname text, name text, average_amount numeric)
+AS 
+$$
+BEGIN
+RETURN QUERY
+select v.surname, v.name, round(avg(vp.amount))
+from visitors v
+join visitor_purchases vp
+on v.visitor_id = vp.visitor_id
+where visitor_name = v.name
+and
+visitor_surname = v.surname
+group by v.visitor_id, v.surname, v.name;	
+END;
+$$ LANGUAGE plpgsql;
+select * from getVisitorPurchases('Lizzy','Keen');
+select * from getVisitorPurchases('Samantha','Ailing');
+
+CREATE OR REPLACE FUNCTION user_insert()
+RETURNS TRIGGER AS 
+$$
+BEGIN
+RAISE notice 'Update to visitors table:'; 
+raise notice '%',new;
+END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER user_update_trigger
+AFTER INSERT ON visitors
+FOR EACH ROW
+EXECUTE FUNCTION user_insert();
+
+insert into visitors(surname, name, date_of_birth, gender, contact_information, membership_id)
+values ('Roy','Kendall','1986-02-19','male','kroy@gmail.com',14);
+
+CREATE OR REPLACE FUNCTION update_details()
+RETURNS TRIGGER AS
+$$
+BEGIN 
+RAISE notice 'There has been update to the items table from:';
+RAISE notice '%', OLD;
+RAISE notice 'Values updated to:';
+RAISE notice '%', NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE OR REPLACE TRIGGER item_update
+AFTER UPDATE ON items
+FOR EACH ROW
+EXECUTE FUNCTION update_details();
+
+update items
+set exhibition_id = 12
+where item_name like 'Fated%';
+
+CREATE OR REPLACE FUNCTION feedback_validation()
+RETURNS TRIGGER AS
+$$
+BEGIN 
+IF NEW.rating > 5 THEN 
+RAISE EXCEPTION 'We know we are good but that rating is too high.
+Please edit the rating: %', New.rating;
+ELSE IF NEW.rating <1 THEN
+RAISE EXCEPTION 'Are we that bad? Please edit the rating:%', New.rating; 
+END IF;	
+END IF;
+RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER on_feedback_update
+BEFORE UPDATE OR INSERT ON feedback
+FOR EACH ROW
+EXECUTE FUNCTION feedback_validate();
+
+insert into feedback(visitor_id, rating, comments)
+values(7,7,'Splendid!');
+insert into feedback(visitor_id, rating, comments)
+values(7,0,'Awful!');
+
+
+
+
+
+
